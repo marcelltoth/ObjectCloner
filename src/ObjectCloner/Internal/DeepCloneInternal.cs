@@ -35,9 +35,9 @@ namespace ObjectCloner.Internal
             // Lines prefixed by # only apply if T is a reference type.
             //
             // (T original, Dictionary<object, object> dict) => {
-            //     if(original == null)
-            //         return null;
-            //
+            //#     if(original == null)
+            //#         return null;
+            //#
             //#    if(dict.TryGetValue(original, out object existingClone))
             //#        return existingClone;
             //
@@ -58,10 +58,11 @@ namespace ObjectCloner.Internal
 
             List<Expression> expressions = new List<Expression>(10);
             
-            expressions.Add(CreateReturnIfNullExpression(originalParameter, returnTarget));
 
             if (!typeOfT.IsValueType)
             {
+                expressions.Add(CreateReturnIfNullExpression(originalParameter, returnTarget));
+                
                 expressions.Add(CreateReturnIfInDictionaryExpression(originalParameter, dictionaryParameter, returnTarget));
             }
             
