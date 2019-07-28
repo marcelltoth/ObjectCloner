@@ -8,6 +8,13 @@ namespace ObjectCloner.Tests.ShallowClone
 {
     public class ClassCloneTests
     {
+        [Fact]
+        public void HandlesNull()
+        {
+            TestClass clone = ObjectCloner<TestClass>.ShallowClone(null);
+            
+            Assert.Null(clone);
+        }
 
         [Fact]
         public void CopiesTestClass()

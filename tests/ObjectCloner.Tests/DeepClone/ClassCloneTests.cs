@@ -6,6 +6,13 @@ namespace ObjectCloner.Tests.DeepClone
 {
     public class ComplexClassCloneTests
     {
+        [Fact]
+        public void HandlesNull()
+        {
+            TestClassOne clone = ObjectCloner<TestClassOne>.DeepClone(null);
+            
+            Assert.Null(clone);
+        }
         
         [Fact]
         public void HandlesComplexExample()
