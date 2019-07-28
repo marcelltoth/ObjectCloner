@@ -116,7 +116,7 @@ namespace ObjectCloner.Internal
             var tryGetValueMethod = typeof(Dictionary<object, object>).GetMethod("TryGetValue", BindingFlags.Instance | BindingFlags.Public);
             Debug.Assert(tryGetValueMethod != null);
             
-            var outTVariable = Expression.Variable(typeof(T));
+            var outTVariable = Expression.Variable(typeof(object));
             return Expression.Block(
                 new[] { outTVariable },
                 Expression.IfThen(
@@ -127,7 +127,7 @@ namespace ObjectCloner.Internal
                                     originalParameter,
                                     outTVariable
                                     )),
-                        Expression.Return(returnTarget, outTVariable)
+                        Expression.Return(returnTarget, Expression.Convert(outTVariable, _typeOfT))
                     )
             );
         }
