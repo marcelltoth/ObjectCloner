@@ -24,7 +24,7 @@ namespace ObjectCloner.Internal
         private static Expression<Func<T, T>> CreateShallowCopyExpressionLamda()
         {
             // Create a lambda like so:
-            // (T input) => (T)input.Membm
+            // (T input) => (T)(input == null ? null : input.MemberwiseClone())
             
             
             var cloneMethod = typeof(T).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -33,10 +33,13 @@ namespace ObjectCloner.Internal
             ParameterExpression parameterExpression = Expression.Parameter(typeof(T), "input");
             var cloneExpression = Expression.Lambda<Func<T, T>>(
                 Expression.Convert(
-                    Expression.Call(
-                        parameterExpression,
-                        cloneMethod
-                    ),
+                    Expression.Condition(
+                            Expression.ReferenceEqual(parameterExpression, Expression.Constant(null)),
+                            Expression.Constant(null),
+                            Expression.Call(
+                                parameterExpression,
+                                cloneMethod
+                            )), 
                     typeof(T)
                 ), 
                 parameterExpression);
