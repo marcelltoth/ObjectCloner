@@ -1,0 +1,15 @@
+# IntelliJ
+
+**/.idea/
+
+.vs/
+[Bb]in/
+[Oo]bj/
+.nuget/
+[Pp]ackages/
+*.user
+*.suo
+
+Thumbs.db
+Desktop.ini
+.DS_Store
