@@ -1,8 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F01054B2-339D-46A8-926D-0A27C74E0BA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7333DFB7-CEDA-4843-AA1D-34AA86933111}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectCloner", "src\ObjectCloner\ObjectCloner.csproj", "{2A713CA2-BBD8-4517-86B3-AFC80923CC9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectCloner.Tests", "tests\ObjectCloner.Tests\ObjectCloner.Tests.csproj", "{CFB07482-E662-4181-9F30-788B6704AA81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2A713CA2-BBD8-4517-86B3-AFC80923CC9B} = {F01054B2-339D-46A8-926D-0A27C74E0BA0}
+		{CFB07482-E662-4181-9F30-788B6704AA81} = {7333DFB7-CEDA-4843-AA1D-34AA86933111}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2A713CA2-BBD8-4517-86B3-AFC80923CC9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A713CA2-BBD8-4517-86B3-AFC80923CC9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A713CA2-BBD8-4517-86B3-AFC80923CC9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A713CA2-BBD8-4517-86B3-AFC80923CC9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFB07482-E662-4181-9F30-788B6704AA81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFB07482-E662-4181-9F30-788B6704AA81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFB07482-E662-4181-9F30-788B6704AA81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFB07482-E662-4181-9F30-788B6704AA81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
