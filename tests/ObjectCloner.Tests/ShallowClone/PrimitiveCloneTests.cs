@@ -7,6 +7,14 @@ namespace ObjectCloner.Tests.ShallowClone
     public class PrimitiveCloneTests
     {
         [Fact]
+        public void HandlesNull()
+        {
+            string clone = ObjectCloner<string>.ShallowClone(null);
+            
+            Assert.Null(clone);
+        }
+        
+        [Fact]
         public void ClonesInt()
         {
             int originalMeaningOfLife = 42;
