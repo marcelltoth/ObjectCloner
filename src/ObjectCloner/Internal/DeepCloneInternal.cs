@@ -192,7 +192,7 @@ namespace ObjectCloner.Internal
         
         private static Expression CreateMemberwiseCloneExpression(ParameterExpression originalParameter, ParameterExpression cloneVariable)
         {
-            MethodInfo cloneMethod = typeof(T).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo cloneMethod = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
             Debug.Assert(cloneMethod != null);
             
             var cloneExpression = Expression.Assign(
