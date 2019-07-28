@@ -187,7 +187,7 @@ namespace ObjectCloner.Internal
                         ),
                     breakTarget
                 ),
-                cloneVariable);
+                Expression.Return(returnTarget, cloneVariable));
         }
         
         private static Expression CreateMemberwiseCloneExpression(ParameterExpression originalParameter, ParameterExpression cloneVariable)
