@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace ObjectCloner.Internal
 {
@@ -43,6 +44,7 @@ namespace ObjectCloner.Internal
             return cloneExpression;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T Identity(T input) => input;
     }
 }
