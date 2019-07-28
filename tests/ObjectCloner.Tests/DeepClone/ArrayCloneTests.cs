@@ -38,7 +38,7 @@ namespace ObjectCloner.Tests.DeepClone
             
             // Assert same values but different objects
             Assert.NotSame(originalArray, newArray);
-            Assert.NotEqual(originalArray, newArray, EqualityComparer<object>.Default);
+            Assert.NotEqual((IEnumerable<TestClass>)originalArray, newArray, ReferenceEqualityComparer<TestClass>.Default);
             Assert.Equal(originalArray, newArray, EqualityComparer<TestClass>.Default);
         }
 

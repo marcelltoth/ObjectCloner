@@ -9,6 +9,8 @@ namespace ObjectCloner.Internal
 {
     internal static class DeepCloneInternal<T>
     {
+        private static readonly Type _typeOfT = typeof(T);
+
         /// <summary>
         ///     Function for the internal implementation of deep cloning.
         ///     First argument is the object to be cloned, second is a map in which already-cloned objects are stored. Call with an empty Dictionary initially.
@@ -16,7 +18,7 @@ namespace ObjectCloner.Internal
         /// <remarks>
         ///     The <see cref="Dictionary{TKey,TValue}"/> argument is used for handling circular references and multiple references to the same object.
         /// </remarks>
-        public static Func<T, Dictionary<object, object>, T> DeepCloner { get; }
+        public static readonly Func<T, Dictionary<object, object>, T> DeepCloner;
 
         static DeepCloneInternal()
         {
@@ -50,16 +52,15 @@ namespace ObjectCloner.Internal
             // }
 
 
-            Type typeOfT = typeof(T);
-            ParameterExpression originalParameter = Expression.Parameter(typeOfT);
+            ParameterExpression originalParameter = Expression.Parameter(_typeOfT);
             ParameterExpression dictionaryParameter = Expression.Parameter(typeof(Dictionary<object,object>));
-            ParameterExpression cloneVariable = Expression.Variable(typeOfT);
-            LabelTarget returnTarget = Expression.Label(typeOfT);
+            ParameterExpression cloneVariable = Expression.Variable(_typeOfT);
+            LabelTarget returnTarget = Expression.Label(_typeOfT);
 
             List<Expression> expressions = new List<Expression>(10);
             
 
-            if (!typeOfT.IsValueType)
+            if (!_typeOfT.IsValueType)
             {
                 expressions.Add(CreateReturnIfNullExpression(originalParameter, returnTarget));
                 
@@ -69,10 +70,12 @@ namespace ObjectCloner.Internal
             
             expressions.Add(CreateMemberwiseCloneExpression(originalParameter, cloneVariable));
             
-            if (!typeOfT.IsValueType)
+            if (!_typeOfT.IsValueType)
             {
                 expressions.Add(CreateAddToDictionaryExpression(originalParameter, dictionaryParameter, cloneVariable));
             }
+            
+            expressions.AddRange(CreateFieldCopyExpressions(originalParameter, dictionaryParameter, cloneVariable));
             
             expressions.Add(Expression.Label(returnTarget, cloneVariable));
 
@@ -82,7 +85,6 @@ namespace ObjectCloner.Internal
             var functionExpression = Expression.Lambda<Func<T, Dictionary<object, object>, T>>(functionBlock, originalParameter, dictionaryParameter);
             return functionExpression.Compile();
         }
-
 
 
         private static ConditionalExpression CreateReturnIfNullExpression(ParameterExpression originalParameter, LabelTarget returnTarget)
@@ -131,7 +133,7 @@ namespace ObjectCloner.Internal
                         originalParameter,
                         cloneMethod
                     ), 
-                    typeof(T)
+                    _typeOfT
                 ));
 
             return cloneExpression;
@@ -140,7 +142,6 @@ namespace ObjectCloner.Internal
         
         private static Expression CreateAddToDictionaryExpression(ParameterExpression originalParameter, ParameterExpression dictionaryParameter, ParameterExpression cloneVariable)
         {
-            
             MethodInfo addMethod = typeof(Dictionary<object,object>).GetMethod("Add", BindingFlags.Instance | BindingFlags.Public);
             Debug.Assert(addMethod != null);
             return Expression.Call(
@@ -150,6 +151,30 @@ namespace ObjectCloner.Internal
                 cloneVariable
             );
         }
+        
+        private static IEnumerable<Expression> CreateFieldCopyExpressions(ParameterExpression originalParameter, ParameterExpression dictionaryParameter, ParameterExpression cloneVariable)
+        {
+            var fields = _typeOfT.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            
+            foreach (FieldInfo field in fields)
+            {
+                FieldInfo fieldCloner = typeof(DeepCloneInternal<>).MakeGenericType(field.FieldType).GetField(nameof(DeepCloner), BindingFlags.Static | BindingFlags.Public);
+                Debug.Assert(fieldCloner != null);
+                MethodInfo invokeMethod = fieldCloner.FieldType.GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
+                Debug.Assert(invokeMethod != null);
+
+                yield return Expression.Assign(
+                    Expression.Field(cloneVariable, field),
+                    Expression.Call(
+                        Expression.Field(null, fieldCloner),
+                        invokeMethod,
+                        Expression.Field(originalParameter, field),
+                        dictionaryParameter
+                    )
+                );
+            }
+        }
+        
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T Identity(T input, Dictionary<object, object> _) => input;
