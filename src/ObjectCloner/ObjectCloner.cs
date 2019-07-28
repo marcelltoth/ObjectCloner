@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 using ObjectCloner.Internal;
@@ -62,7 +63,7 @@ namespace ObjectCloner
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T DeepClone(T original)
         {
-            throw new NotImplementedException();
+            return DeepCloneInternal<T>.DeepCloner(original, new Dictionary<object, object>());
         }
     }
 }

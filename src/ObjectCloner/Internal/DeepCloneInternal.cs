@@ -1,0 +1,30 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+namespace ObjectCloner.Internal
+{
+    internal static class DeepCloneInternal<T>
+    {
+        /// <summary>
+        ///     Function for the internal implementation of deep cloning.
+        ///     First argument is the object to be cloned, second is a map in which already-cloned objects are stored. Call with an empty Dictionary initially.
+        /// </summary>
+        /// <remarks>
+        ///     The <see cref="IDictionary{TKey,TValue}"/> argument is used for handling circular references and multiple references to the same object.
+        /// </remarks>
+        public static Func<T, IDictionary<object, object>, T> DeepCloner { get; }
+
+        static DeepCloneInternal()
+        {
+            if (typeof(T).IsPrimitive || typeof(T) == typeof(string))
+            {
+                DeepCloner = Identity;
+                return;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static T Identity(T input, IDictionary<object, object> _) => input;
+    }
+}
