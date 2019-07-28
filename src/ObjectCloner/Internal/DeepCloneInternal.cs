@@ -39,6 +39,8 @@ namespace ObjectCloner.Internal
             // (T original, Dictionary<object, object> dict) => {
             //#     if(original == null)
             //#         return null;
+            //
+            //      //Special treatment for arrays
             //#
             //#    if(dict.TryGetValue(original, out object existingClone))
             //#        return existingClone;
@@ -66,16 +68,25 @@ namespace ObjectCloner.Internal
                 
                 expressions.Add(CreateReturnIfInDictionaryExpression(originalParameter, dictionaryParameter, returnTarget));
             }
-            
-            
-            expressions.Add(CreateMemberwiseCloneExpression(originalParameter, cloneVariable));
-            
-            if (!_typeOfT.IsValueType)
+
+            if (_typeOfT.IsArray)
             {
-                expressions.Add(CreateAddToDictionaryExpression(originalParameter, dictionaryParameter, cloneVariable));
+                expressions.Add(CreateArrayCloneExpression(originalParameter, dictionaryParameter, returnTarget));
+            }
+            else
+            {
+                expressions.Add(CreateMemberwiseCloneExpression(originalParameter, cloneVariable));
+            
+                if (!_typeOfT.IsValueType)
+                {
+                    expressions.Add(CreateAddToDictionaryExpression(originalParameter, dictionaryParameter, cloneVariable));
+                }
+            
+                expressions.AddRange(CreateFieldCopyExpressions(originalParameter, dictionaryParameter, cloneVariable));
             }
             
-            expressions.AddRange(CreateFieldCopyExpressions(originalParameter, dictionaryParameter, cloneVariable));
+            
+            
             
             expressions.Add(Expression.Label(returnTarget, cloneVariable));
 
@@ -119,6 +130,64 @@ namespace ObjectCloner.Internal
                         Expression.Return(returnTarget, outTVariable)
                     )
             );
+        }
+
+        private static Expression CreateArrayCloneExpression(ParameterExpression originalParameter, ParameterExpression dictionaryParameter, LabelTarget returnTarget)
+        {
+            // Arrays need special treatment. We generate code like this:
+            // var length = original.Length;
+            // TItem[] clone = new TItem[length]();
+            // for(int i = 0; i < length; i++){
+            //     clone[i] = DeepCloneInternal<TItem>.FieldCloner.Invoke(original[i], dict);
+            // }
+
+            Type itemType = _typeOfT.GetElementType();
+            Debug.Assert(itemType != null);
+            FieldInfo itemCloner = typeof(DeepCloneInternal<>).MakeGenericType(itemType).GetField(nameof(DeepCloner), BindingFlags.Static | BindingFlags.Public);
+            Debug.Assert(itemCloner != null);
+            MethodInfo invokeMethod = itemCloner.FieldType.GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
+            Debug.Assert(invokeMethod != null);
+
+            
+            ParameterExpression lengthVariable = Expression.Variable(typeof(int));
+            ParameterExpression indexVariable = Expression.Variable(typeof(int));
+            ParameterExpression cloneVariable = Expression.Variable(_typeOfT);
+            LabelTarget breakTarget = Expression.Label();
+
+            return Expression.Block(
+                new[] { lengthVariable, indexVariable, cloneVariable },
+                Expression.Assign(
+                    lengthVariable,
+                    Expression.ArrayLength(originalParameter)
+                ),
+                Expression.Assign(
+                    cloneVariable,
+                    Expression.NewArrayBounds(itemType, lengthVariable)
+                ),
+                Expression.Assign(
+                    indexVariable,
+                    Expression.Constant(0))
+                ,
+                Expression.Loop(
+                    Expression.Block(
+                        Expression.IfThen(
+                                Expression.GreaterThanOrEqual(indexVariable, lengthVariable),
+                                Expression.Break(breakTarget)
+                            ),
+                        Expression.Assign(
+                            Expression.ArrayAccess(cloneVariable, indexVariable),
+                            Expression.Call(
+                                Expression.Field(null, itemCloner),
+                                invokeMethod,
+                                Expression.ArrayIndex(originalParameter, indexVariable),
+                                dictionaryParameter
+                                )
+                            ),
+                        Expression.PostIncrementAssign(indexVariable)
+                        ),
+                    breakTarget
+                ),
+                cloneVariable);
         }
         
         private static Expression CreateMemberwiseCloneExpression(ParameterExpression originalParameter, ParameterExpression cloneVariable)
