@@ -1,4 +1,7 @@
 using System;
+using System.Runtime.CompilerServices;
+
+using ObjectCloner.Internal;
 
 namespace ObjectCloner
 {
@@ -26,9 +29,10 @@ namespace ObjectCloner
         ///         For this reason be cautious with cloning types requiring special initialization / cleanup (e.g. ones implementing <see cref="IDisposable"/>).
         ///     </para>
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T ShallowClone(T original)
         {
-            throw new NotImplementedException();
+            return ShallowCopyInternal<T>.ShallowCopier(original);
         }
     }
 }
