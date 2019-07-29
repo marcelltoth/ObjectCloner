@@ -201,20 +201,58 @@ namespace ObjectCloner.Internal
             
             foreach (FieldInfo field in fields)
             {
+                // Skip fields that are deeply immutable
+                if (TypeHelper.CanSkipDeepClone(field.FieldType))
+                {
+                    continue;
+                }
+
+
+                MemberExpression cloneFieldExpression = Expression.Field(_cloneVariable, field);
+                
                 FieldInfo fieldCloner = typeof(DeepCloneInternal<>).MakeGenericType(field.FieldType).GetField("DeepCloner", BindingFlags.Static | BindingFlags.Public);
                 Debug.Assert(fieldCloner != null);
                 MethodInfo invokeMethod = fieldCloner.FieldType.GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
                 Debug.Assert(invokeMethod != null);
+                
+                if (!field.IsInitOnly)
+                {
+                    // Read-write fields are easy to set. Generate code like:
+                    // clone.field = DeepCloneInternal<TypeOfField>.DeepCloner(original.field, dict);
+                    
+                    
 
-                yield return Expression.Assign(
-                    Expression.Field(_cloneVariable, field),
-                    Expression.Call(
-                        Expression.Field(null, fieldCloner),
-                        invokeMethod,
-                        Expression.Field(_originalParameter, field),
-                        _dictionaryParameter
-                    )
-                );
+                    yield return Expression.Assign(
+                        cloneFieldExpression,
+                        Expression.Call(
+                            Expression.Field(null, fieldCloner),
+                            invokeMethod,
+                            Expression.Field(_originalParameter, field),
+                            _dictionaryParameter
+                        )
+                    );
+                }
+                else
+                {
+                    // Readonly fields can be written using reflection. (Although it is an implementation detail: https://stackoverflow.com/questions/934930/can-i-change-a-private-readonly-field-in-c-sharp-using-reflection#comment743456_934944)
+                    // Code: fieldInfoConstant.SetValue(clone.field, DeepCloneInternal<TypeOfField>.DeepCloner(original.field, dict));
+                    
+                    MethodInfo setValueMethod = typeof(FieldInfo).GetMethod("SetValue", new[] { typeof(object), typeof(object) });
+                    Debug.Assert(setValueMethod != null);
+                    
+                    yield return Expression.Call(
+                        Expression.Constant(field),
+                        setValueMethod,
+                        _cloneVariable,
+                            Expression.Call(
+                                Expression.Field(null, fieldCloner),
+                                invokeMethod,
+                                Expression.Field(_originalParameter, field),
+                                _dictionaryParameter
+                            ));
+                }
+                
+                
             }
         }
     }

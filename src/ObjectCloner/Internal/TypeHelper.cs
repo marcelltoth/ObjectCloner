@@ -1,29 +1,24 @@
 using System;
+using System.Collections.Concurrent;
 
 namespace ObjectCloner.Internal
 {
     /// <summary>
-    ///     Contains optimized helper methods about the type <typeparamref name="T"/>.
+    ///     Contains optimized helper methods about types.
     /// </summary>
-    internal static class TypeHelper<T>
+    internal static class TypeHelper
     {
+        private static readonly ConcurrentDictionary<Type, bool> _canSkipDeepCloneMap = new ConcurrentDictionary<Type, bool>();
+        
         /// <summary>
-        ///     True if we can safely skip deep cloning of an object of type <typeparamref name="T"/>. 
+        ///     True if we can safely skip deep cloning of an object of type <paramref name="type"/>.
         /// </summary>
         /// <remarks>
         ///     True in the case of deeply immutable objects.
         /// </remarks>
-        public static bool CanSkipDeepClone { get; }
-
-        static TypeHelper()
+        public static bool CanSkipDeepClone(Type type)
         {
-            Type type = typeof(T);
-            CanSkipDeepClone = CalculateCanSkipDeepClone(type);
-        }
-
-        private static bool CalculateCanSkipDeepClone(Type type)
-        {
-            return type.IsPrimitive || type == typeof(string);
+            return _canSkipDeepCloneMap.GetOrAdd(type, t => t.IsPrimitive || t == typeof(string) || t == typeof(object));
         }
     }
 }

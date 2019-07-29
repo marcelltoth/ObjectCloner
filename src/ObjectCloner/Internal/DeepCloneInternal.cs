@@ -17,7 +17,7 @@ namespace ObjectCloner.Internal
 
         static DeepCloneInternal()
         {
-            if (TypeHelper<T>.CanSkipDeepClone)
+            if (TypeHelper.CanSkipDeepClone(typeof(T)))
             {
                 DeepCloner = Identity;
                 return;
