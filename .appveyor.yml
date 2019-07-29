@@ -26,8 +26,11 @@ artifacts:
    name: library
 clone_depth: 1
 test_script:
-  # run the unit tests
-  - cmd: "packages/opencover/4.7.922/tools/OpenCover.Console.exe" -register:user -target:"dotnet.exe" -targetargs:"test" -output:"./coverage.xml" -oldstyle -filter:"+[ObjectCloner*]* -[ObjectCloner.Test*]*" 
+  # Run the unit tests first without coverage so it fails the build if needed
+  - cmd: dotnet test -c Release --no-build
+  # Run code coverage
+  - cmd: >
+     "packages/opencover/4.7.922/tools/OpenCover.Console.exe" -register:user -target:"dotnet.exe" -targetargs:"test" -output:"./coverage.xml" -oldstyle -filter:"+[ObjectCloner*]* -[ObjectCloner.Test*]*"
   - cmd: codecov -f "coverage.xml"
   - cmd: rm "coverage.xml"
 on_finish :
