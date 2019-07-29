@@ -9,8 +9,8 @@ script:
  - dotnet test --no-build
 matrix:
   include:
-    - dotnet: 2.1.502
+    - dotnet: 2.2.401
       mono: none
-    - mono: latest
-      dotnet: 3.0.100-preview7-012821
+    - dotnet: 3.0.100-preview7-012821
+      mono: none
     
