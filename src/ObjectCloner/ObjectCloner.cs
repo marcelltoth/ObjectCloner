@@ -67,7 +67,10 @@ namespace ObjectCloner
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T DeepClone<T>(T original)
         {
-            return DeepCloneInternal<T>.DeepCloner(original, new Dictionary<object, object>());
+            object originalBoxed = original;
+            if (originalBoxed == null)
+                return (T)(object)null;
+            return (T)DeepCloneInternal.GetDeepCloner(originalBoxed.GetType())(originalBoxed, new Dictionary<object, object>());
         }
     }
 }
