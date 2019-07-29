@@ -28,7 +28,7 @@ artifacts:
 clone_depth: 1
 test_script:
   # run the unit tests
-  - cmd: OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\tests\ObjectCloner.Tests\bin\Release\netcoreapp2.2\publish\ObjectCloner.Tests.dll"  -output:".\MyProject_coverage.xml"
+  - cmd: OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\tests\ObjectCloner.Tests\bin\Release\netcoreapp2.2\publish\ObjectCloner.Tests.dll -noshadow" -filter:"+[ObjectCloner*]* -[ObjectCloner.Tests*]*" -output:".\MyProject_coverage.xml"
   - cmd: codecov -f "MyProject_coverage.xml"
 on_finish :
   # any cleanup in here
