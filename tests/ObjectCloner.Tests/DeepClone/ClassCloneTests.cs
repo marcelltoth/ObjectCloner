@@ -9,7 +9,7 @@ namespace ObjectCloner.Tests.DeepClone
         [Fact]
         public void HandlesNull()
         {
-            TestClassOne clone = ObjectCloner<TestClassOne>.DeepClone(null);
+            TestClassOne clone = ObjectCloner.DeepClone<TestClassOne>(null);
             
             Assert.Null(clone);
         }
@@ -38,7 +38,7 @@ namespace ObjectCloner.Tests.DeepClone
                 }
             };
 
-            TestClassOne clone = ObjectCloner<TestClassOne>.DeepClone(original);
+            TestClassOne clone = ObjectCloner.DeepClone(original);
             
             // TODO: break this into multiple smaller tests - the number of asssertions is a code smell itself
             Assert.NotSame(original, clone);
@@ -61,7 +61,7 @@ namespace ObjectCloner.Tests.DeepClone
             original.ClassReference = originalTwo;
             originalTwo.CircularReferenceProp = original;
 
-            TestClassOne clone = ObjectCloner<TestClassOne>.DeepClone(original);
+            TestClassOne clone = ObjectCloner.DeepClone(original);
             Assert.NotSame(original, clone.ClassReference.CircularReferenceProp);
             Assert.Same(clone, clone.ClassReference.CircularReferenceProp);
         }
@@ -72,7 +72,7 @@ namespace ObjectCloner.Tests.DeepClone
             TestClassTwo originalClass = new TestClassTwo(42);
             TestClassTwo[] originalArray = new[] { originalClass, originalClass };
 
-            var clone = ObjectCloner<TestClassTwo[]>.DeepClone(originalArray);
+            var clone = ObjectCloner.DeepClone(originalArray);
             
             Assert.Same(clone[0], clone[1]);
             Assert.NotSame(clone[0], originalClass);

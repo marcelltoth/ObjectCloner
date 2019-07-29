@@ -11,7 +11,7 @@ namespace ObjectCloner.Tests.ShallowClone
         [Fact]
         public void HandlesNull()
         {
-            TestClass clone = ObjectCloner<TestClass>.ShallowClone(null);
+            TestClass clone = ObjectCloner.ShallowClone<TestClass>(null);
             
             Assert.Null(clone);
         }
@@ -27,7 +27,7 @@ namespace ObjectCloner.Tests.ShallowClone
                 ArrayProperty = new []{2,3,4}
             };
 
-            TestClass clone = ObjectCloner<TestClass>.ShallowClone(original);
+            TestClass clone = ObjectCloner.ShallowClone(original);
             
             Assert.NotSame(original, clone);
             
@@ -41,7 +41,7 @@ namespace ObjectCloner.Tests.ShallowClone
         {
             TestClassPrivateField original = new TestClassPrivateField(42);
 
-            TestClassPrivateField clone = ObjectCloner<TestClassPrivateField>.ShallowClone(original);
+            TestClassPrivateField clone = ObjectCloner.ShallowClone(original);
             
             Assert.Equal(42, (int)typeof(TestClassPrivateField).GetField("_privateField", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(clone));
         }

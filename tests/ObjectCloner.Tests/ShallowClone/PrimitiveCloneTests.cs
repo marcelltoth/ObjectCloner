@@ -9,7 +9,7 @@ namespace ObjectCloner.Tests.ShallowClone
         [Fact]
         public void HandlesNull()
         {
-            string clone = ObjectCloner<string>.ShallowClone(null);
+            string clone = ObjectCloner.ShallowClone<string>(null);
             
             Assert.Null(clone);
         }
@@ -19,7 +19,7 @@ namespace ObjectCloner.Tests.ShallowClone
         {
             int originalMeaningOfLife = 42;
 
-            int newMeaningOfLife = ObjectCloner<int>.ShallowClone(originalMeaningOfLife);
+            int newMeaningOfLife = ObjectCloner.ShallowClone(originalMeaningOfLife);
             
             Assert.Equal(originalMeaningOfLife, newMeaningOfLife);
         }
@@ -30,7 +30,7 @@ namespace ObjectCloner.Tests.ShallowClone
         {
             string helloWorldOriginal = "Hello world";
 
-            string newHelloWorld = ObjectCloner<string>.ShallowClone(helloWorldOriginal);
+            string newHelloWorld = ObjectCloner.ShallowClone(helloWorldOriginal);
             
             // Here we want actual reference equality. A string is immutable, there would be no point in creating a new instance.
             // And because of Interning we might not get a new one even if we wanted to. (There has to be a way around that but why.)

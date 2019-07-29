@@ -7,7 +7,7 @@ namespace ObjectCloner.Tests.DeepClone
         [Fact]
         public void HandlesNull()
         {
-            string clone = ObjectCloner<string>.DeepClone(null);
+            string clone = ObjectCloner.DeepClone<string>(null);
             
             Assert.Null(clone);
         }
@@ -17,7 +17,7 @@ namespace ObjectCloner.Tests.DeepClone
         {
             int original = 42;
 
-            int clone = ObjectCloner<int>.DeepClone(original);
+            int clone = ObjectCloner.DeepClone(original);
             
             Assert.Equal(original, clone);
         }
@@ -27,7 +27,7 @@ namespace ObjectCloner.Tests.DeepClone
         {
             string original = "Hello world";
 
-            string clone = ObjectCloner<string>.DeepClone(original);
+            string clone = ObjectCloner.DeepClone(original);
             
             Assert.Same(original, clone);
         }

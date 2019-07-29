@@ -12,7 +12,7 @@ namespace ObjectCloner.Tests.DeepClone
         {
             int[] originalArray = { 3, 42, 123 };
 
-            int[] newArray = ObjectCloner<int[]>.DeepClone(originalArray);
+            int[] newArray = ObjectCloner.DeepClone(originalArray);
             
             Assert.NotSame(originalArray, newArray);
             Assert.Equal(originalArray, newArray);
@@ -23,7 +23,7 @@ namespace ObjectCloner.Tests.DeepClone
         {
             DateTime[] originalArray = { new DateTime(1997, 11, 6),  new DateTime(2019, 7, 28) };
 
-            DateTime[] newArray = ObjectCloner<DateTime[]>.DeepClone(originalArray);
+            DateTime[] newArray = ObjectCloner.DeepClone(originalArray);
             
             Assert.NotSame(originalArray, newArray);
             Assert.Equal(originalArray, newArray);
@@ -34,7 +34,7 @@ namespace ObjectCloner.Tests.DeepClone
         {
             TestClass[] originalArray = { new TestClass(2), new TestClass(3), new TestClass(5),  };
 
-            TestClass[] newArray = ObjectCloner<TestClass[]>.DeepClone(originalArray);
+            TestClass[] newArray = ObjectCloner.DeepClone(originalArray);
             
             // Assert same values but different objects
             Assert.NotSame(originalArray, newArray);

@@ -11,7 +11,7 @@ namespace ObjectCloner.Tests.ShallowClone
         {
             int[] originalArray = { 3, 42, 123 };
 
-            int[] newArray = ObjectCloner<int[]>.ShallowClone(originalArray);
+            int[] newArray = ObjectCloner.ShallowClone(originalArray);
             
             Assert.NotSame(originalArray, newArray);
             Assert.Equal(originalArray, newArray);
@@ -22,7 +22,7 @@ namespace ObjectCloner.Tests.ShallowClone
         {
             DateTime[] originalArray = { new DateTime(1997, 11, 6),  new DateTime(2019, 7, 28) };
 
-            DateTime[] newArray = ObjectCloner<DateTime[]>.ShallowClone(originalArray);
+            DateTime[] newArray = ObjectCloner.ShallowClone(originalArray);
             
             Assert.NotSame(originalArray, newArray);
             Assert.Equal(originalArray, newArray);
@@ -33,7 +33,7 @@ namespace ObjectCloner.Tests.ShallowClone
         {
             TestClass[] originalArray = { new TestClass(), new TestClass(), new TestClass(),  };
 
-            TestClass[] newArray = ObjectCloner<TestClass[]>.ShallowClone(originalArray);
+            TestClass[] newArray = ObjectCloner.ShallowClone(originalArray);
             
             Assert.NotSame(originalArray, newArray);
             Assert.Equal(originalArray, newArray);

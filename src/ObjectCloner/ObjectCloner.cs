@@ -10,7 +10,7 @@ namespace ObjectCloner
     ///     Provides static helper methods that clone an object of type <typeparamref name="T"/>, either shallowly or deeply.
     /// </summary>
     /// <typeparam name="T">The type of object to clone.</typeparam>
-    public static class ObjectCloner<T>
+    public static class ObjectCloner
     {
         /// <summary>
         ///     Creates a shallow copy of <paramref name="original"/>.
@@ -31,7 +31,7 @@ namespace ObjectCloner
         ///     </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T ShallowClone(T original)
+        public static T ShallowClone<T>(T original)
         {
             return ShallowCopyInternal<T>.ShallowCopier(original);
         }
@@ -61,7 +61,7 @@ namespace ObjectCloner
         ///     </para>
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T DeepClone(T original)
+        public static T DeepClone<T>(T original)
         {
             return DeepCloneInternal<T>.DeepCloner(original, new Dictionary<object, object>());
         }

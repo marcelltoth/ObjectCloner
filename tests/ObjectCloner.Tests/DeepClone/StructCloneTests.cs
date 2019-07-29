@@ -18,7 +18,7 @@ namespace ObjectCloner.Tests.DeepClone
                 ClassProp = originalClass
             };
 
-            TestStruct resultStruct = ObjectCloner<TestStruct>.DeepClone(originalStruct);
+            TestStruct resultStruct = ObjectCloner.DeepClone(originalStruct);
             
             Assert.Equal(originalStruct.PrimitiveProp, resultStruct.PrimitiveProp);
             Assert.NotSame(originalStruct.ClassProp, resultStruct.ClassProp);
@@ -30,7 +30,7 @@ namespace ObjectCloner.Tests.DeepClone
         {
             TestStruct originalStruct = new TestStruct();
             
-            TestStruct result = ObjectCloner<TestStruct>.DeepClone(originalStruct);
+            TestStruct result = ObjectCloner.DeepClone(originalStruct);
             
             Assert.Null(result.ClassProp);
         }
