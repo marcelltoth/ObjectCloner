@@ -13,10 +13,14 @@ It utilizes compiled Expression Trees under the hood, making it **just as fast a
 - [x] Does not require a parameterless constructor or custom attribute
 - [x] Clones properties
 - [x] Clones read-only fields
-- [x] Preserves reference equality in the tree*
+- [x] Preserves reference equality in the tree<sup>[1](#f1)</sup>
 - [x] Handles circular dependencies
+- [x] Handles polymorphism<sup>[2](#f2)</sup>
 
-*For example if you put the same object into an array 3 times, you will get back a different list which also contains the same single clone object 3 times.
+
+<sup id="f1">1</sup> For example if you put the same object into an array 3 times, you will get back a different list which also contains the same single clone object 3 times.
+
+<sup id="f2">2</sup> Interface-typed fields (`IEnumerable`, etc.) will be cloned using their actual runtime types.
 
 ### Installation
 The package is available from *NuGet*. Install via the package manager console: `PM> Install-Package AutoMapper` the dotnet command line: `dotnet add package ObjectCloner` or using your IDE's visual NuGet tool.

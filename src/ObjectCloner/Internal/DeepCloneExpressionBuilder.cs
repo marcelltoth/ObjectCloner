@@ -6,21 +6,44 @@ using System.Reflection;
 
 namespace ObjectCloner.Internal
 {
-    internal class DeepCloneExpressionBuilder<T>
+    internal class DeepCloneExpressionBuilder
     {
-        private static readonly Type _typeOfT = typeof(T);
+        private static readonly Type _typeOfObject = typeof(object);
+        private readonly Type _typeOfT;
         
-        private readonly ParameterExpression _originalParameter = Expression.Parameter(_typeOfT, "original");
-        private readonly ParameterExpression _dictionaryParameter = Expression.Parameter(typeof(Dictionary<object,object>), "dict");
-        private readonly ParameterExpression _cloneVariable = Expression.Variable(_typeOfT, "clone");
-        private readonly LabelTarget _returnTarget = Expression.Label(_typeOfT);
+        private readonly ParameterExpression _originalParameter;
+        private readonly ParameterExpression _originalVariable;
+        private readonly ParameterExpression _dictionaryParameter;
+        private readonly ParameterExpression _cloneVariable;
+        private readonly LabelTarget _returnTarget;
+        
+        
+        private readonly MethodInfo itemClonerGetter = typeof(DeepCloneInternal).GetMethod("GetDeepCloner", BindingFlags.Static | BindingFlags.Public);
+        private readonly MethodInfo invokeMethod = typeof(DeepCloner).GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
+        private readonly MethodInfo getTypeMethod = _typeOfObject.GetMethod("GetType", BindingFlags.Public | BindingFlags.Instance);
 
-        public Expression<Func<T, Dictionary<object, object>, T>> Build()
+        public DeepCloneExpressionBuilder(Type typeOfT)
+        {
+            _typeOfT = typeOfT;
+            _dictionaryParameter = Expression.Parameter(typeof(Dictionary<object,object>), "dict");
+            _returnTarget = Expression.Label(_typeOfObject);
+            _cloneVariable = Expression.Variable(_typeOfT, "clone");
+            _originalParameter = Expression.Parameter(_typeOfObject, "original");
+            _originalVariable = Expression.Parameter(_typeOfT, "originalCasted");
+            
+            
+            Debug.Assert(itemClonerGetter != null);
+            Debug.Assert(invokeMethod != null);
+            Debug.Assert(getTypeMethod != null);
+        }
+
+
+        public Expression<DeepCloner> Build()
         {
             // Here is the method we need to create:
             // Lines prefixed by # only apply if T is a reference type.
             //
-            // (T original, Dictionary<object, object> dict) => {
+            // (objct original, Dictionary<object, object> dict) => {
             //#     if(original == null)
             //#         return null;
             //
@@ -38,6 +61,14 @@ namespace ObjectCloner.Internal
             // }
             
             List<Expression> expressions = new List<Expression>(10);
+            
+            expressions.Add(Expression.Assign(
+                    _originalVariable,
+                    Expression.Convert(
+                            _originalParameter,
+                            _typeOfT
+                        )
+                ));
             
             if (!_typeOfT.IsValueType)
             {
@@ -65,12 +96,12 @@ namespace ObjectCloner.Internal
             
             
             
-            expressions.Add(Expression.Label(_returnTarget, _cloneVariable));
+            expressions.Add(Expression.Label(_returnTarget, Expression.Convert(_cloneVariable, _typeOfObject)));
 
 
-            var functionBlock = Expression.Block(new[] {_cloneVariable}, expressions);
+            var functionBlock = Expression.Block(new[] {_cloneVariable, _originalVariable}, expressions);
 
-            return Expression.Lambda<Func<T, Dictionary<object, object>, T>>(functionBlock, _originalParameter, _dictionaryParameter);
+            return Expression.Lambda<DeepCloner>(functionBlock, _originalParameter, _dictionaryParameter);
         }
         
         private ConditionalExpression CreateReturnIfNullExpression()
@@ -79,8 +110,8 @@ namespace ObjectCloner.Internal
             //         return null;
             
             return Expression.IfThen(
-                Expression.ReferenceEqual(_originalParameter, Expression.Constant(null)),
-                Expression.Return(_returnTarget, Expression.Constant(null, typeof(T)))
+                Expression.ReferenceEqual(_originalVariable, Expression.Constant(null)),
+                Expression.Return(_returnTarget, Expression.Constant(null, _typeOfObject))
             );
         }
         private Expression CreateReturnIfInDictionaryExpression()
@@ -91,7 +122,7 @@ namespace ObjectCloner.Internal
             var tryGetValueMethod = typeof(Dictionary<object, object>).GetMethod("TryGetValue", BindingFlags.Instance | BindingFlags.Public);
             Debug.Assert(tryGetValueMethod != null);
             
-            var outTVariable = Expression.Variable(typeof(object));
+            var outTVariable = Expression.Variable(_typeOfObject);
             return Expression.Block(
                 new[] { outTVariable },
                 Expression.IfThen(
@@ -99,10 +130,10 @@ namespace ObjectCloner.Internal
                                 Expression.Call(
                                     _dictionaryParameter,
                                     tryGetValueMethod,
-                                    _originalParameter,
+                                    _originalVariable,
                                     outTVariable
                                     )),
-                        Expression.Return(_returnTarget, Expression.Convert(outTVariable, _typeOfT))
+                        Expression.Return(_returnTarget, outTVariable)
                     )
             );
         }
@@ -117,12 +148,6 @@ namespace ObjectCloner.Internal
             // }
 
             Type itemType = _typeOfT.GetElementType();
-            Debug.Assert(itemType != null);
-            FieldInfo itemCloner = typeof(DeepCloneInternal<>).MakeGenericType(itemType).GetField("DeepCloner", BindingFlags.Static | BindingFlags.Public);
-            Debug.Assert(itemCloner != null);
-            MethodInfo invokeMethod = itemCloner.FieldType.GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
-            Debug.Assert(invokeMethod != null);
-
             
             ParameterExpression lengthVariable = Expression.Variable(typeof(int));
             ParameterExpression indexVariable = Expression.Variable(typeof(int));
@@ -132,7 +157,7 @@ namespace ObjectCloner.Internal
                 new[] { lengthVariable, indexVariable },
                 Expression.Assign(
                     lengthVariable,
-                    Expression.ArrayLength(_originalParameter)
+                    Expression.ArrayLength(_originalVariable)
                 ),
                 Expression.Assign(
                     _cloneVariable,
@@ -150,30 +175,48 @@ namespace ObjectCloner.Internal
                             ),
                         Expression.Assign(
                             Expression.ArrayAccess(_cloneVariable, indexVariable),
-                            Expression.Call(
-                                Expression.Field(null, itemCloner),
-                                invokeMethod,
-                                Expression.ArrayIndex(_originalParameter, indexVariable),
-                                _dictionaryParameter
+                            Expression.Convert(
+                                CreateRecursiveCallExpression(Expression.ArrayAccess(_originalVariable, indexVariable)),
+                                itemType
                                 )
                             ),
                         Expression.PostIncrementAssign(indexVariable)
                         ),
                     breakTarget
                 ),
-                Expression.Return(_returnTarget, _cloneVariable));
+                Expression.Return(_returnTarget, Expression.Convert(_cloneVariable, _typeOfObject)));
         }
-        
+
+        private Expression CreateRecursiveCallExpression(Expression objectToCopy)
+        {
+            // Create code like so:
+            // __INPUT_XPR__ != null ? DeepCloneInternal.GetDeepCloner((__INPUT_XPR__).GetType())(__INPUT_XPR__, dict) : null
+            // where __INPUT_XPR__ is the input expression (objectToCopy)
+            return Expression.Condition(
+                    Expression.ReferenceEqual(Expression.Convert(objectToCopy, _typeOfObject), Expression.Constant(null)),
+                    Expression.Convert(Expression.Constant(null), _typeOfObject),
+                    Expression.Call(
+                        Expression.Call(null, itemClonerGetter, Expression.Call(
+                            objectToCopy,
+                            getTypeMethod
+                        )),
+                        invokeMethod,
+                        Expression.Convert(objectToCopy, _typeOfObject),
+                        _dictionaryParameter
+                    )
+                );
+        }
+
         private Expression CreateMemberwiseCloneExpression()
         {
-            MethodInfo cloneMethod = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
+            MethodInfo cloneMethod = _typeOfObject.GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
             Debug.Assert(cloneMethod != null);
             
             var cloneExpression = Expression.Assign(
                 _cloneVariable,
                 Expression.Convert(
                     Expression.Call(
-                        _originalParameter,
+                        _originalVariable,
                         cloneMethod
                     ), 
                     _typeOfT
@@ -190,7 +233,7 @@ namespace ObjectCloner.Internal
             return Expression.Call(
                 _dictionaryParameter,
                 addMethod,
-                _originalParameter,
+                _originalVariable,
                 _cloneVariable
             );
         }
@@ -209,27 +252,18 @@ namespace ObjectCloner.Internal
 
 
                 MemberExpression cloneFieldExpression = Expression.Field(_cloneVariable, field);
-                
-                FieldInfo fieldCloner = typeof(DeepCloneInternal<>).MakeGenericType(field.FieldType).GetField("DeepCloner", BindingFlags.Static | BindingFlags.Public);
-                Debug.Assert(fieldCloner != null);
-                MethodInfo invokeMethod = fieldCloner.FieldType.GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
-                Debug.Assert(invokeMethod != null);
-                
+
                 if (!field.IsInitOnly)
                 {
                     // Read-write fields are easy to set. Generate code like:
                     // clone.field = DeepCloneInternal<TypeOfField>.DeepCloner(original.field, dict);
                     
-                    
-
                     yield return Expression.Assign(
                         cloneFieldExpression,
-                        Expression.Call(
-                            Expression.Field(null, fieldCloner),
-                            invokeMethod,
-                            Expression.Field(_originalParameter, field),
-                            _dictionaryParameter
-                        )
+                        Expression.Convert(
+                            CreateRecursiveCallExpression(Expression.Field(_originalVariable, field)),
+                            field.FieldType
+                            )
                     );
                 }
                 else
@@ -237,19 +271,14 @@ namespace ObjectCloner.Internal
                     // Readonly fields can be written using reflection. (Although it is an implementation detail: https://stackoverflow.com/questions/934930/can-i-change-a-private-readonly-field-in-c-sharp-using-reflection#comment743456_934944)
                     // Code: fieldInfoConstant.SetValue(clone.field, DeepCloneInternal<TypeOfField>.DeepCloner(original.field, dict));
                     
-                    MethodInfo setValueMethod = typeof(FieldInfo).GetMethod("SetValue", new[] { typeof(object), typeof(object) });
+                    MethodInfo setValueMethod = typeof(FieldInfo).GetMethod("SetValue", new[] { _typeOfObject, _typeOfObject });
                     Debug.Assert(setValueMethod != null);
-                    
+
                     yield return Expression.Call(
                         Expression.Constant(field),
                         setValueMethod,
                         _cloneVariable,
-                            Expression.Call(
-                                Expression.Field(null, fieldCloner),
-                                invokeMethod,
-                                Expression.Field(_originalParameter, field),
-                                _dictionaryParameter
-                            ));
+                        CreateRecursiveCallExpression(Expression.Field(_originalVariable, field)));
                 }
                 
                 

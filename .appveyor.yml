@@ -1,4 +1,4 @@
-version: '2.0.0'
+version: '2.1.6.{build}'
 image: Visual Studio 2017
 branches:
   only:
@@ -6,9 +6,9 @@ branches:
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
+  version: '2.1.6'
+  package_version: '2.1.6'
+  assembly_version: '2.1.6'
   file_version: '{version}'
   informational_version: '{version}'
 init:
