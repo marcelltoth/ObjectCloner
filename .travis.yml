@@ -1,0 +1,16 @@
+language: csharp
+solution: ObjectCloner.sln
+mono: none
+dotnet: 2.1.502
+install:
+ - dotnet restore
+script:
+ - dotnet publish -c Release
+ - dotnet test --no-build
+matrix:
+  include:
+    - dotnet: 2.1.502
+      mono: none
+    - mono: latest
+      dotnet: 3.0.100-preview7-012821
+    
