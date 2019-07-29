@@ -37,6 +37,7 @@ namespace ObjectCloner.Tests.ShallowClone
             Assert.Same(original.ArrayProperty, clone.ArrayProperty);
         }
 
+        [Fact]
         public void CopiesPrivateField()
         {
             TestClassPrivateField original = new TestClassPrivateField(42);
