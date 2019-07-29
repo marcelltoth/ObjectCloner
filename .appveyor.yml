@@ -10,7 +10,6 @@ install:
   # Install repo specific stuff here
 before_build:
   # Install OpenCover and CodeCov integration
-  - cmd: choco install opencover.portable
   - cmd: choco install codecov
 
   # Display .NET Core version
@@ -28,8 +27,9 @@ artifacts:
 clone_depth: 1
 test_script:
   # run the unit tests
-  - cmd: OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\tests\ObjectCloner.Tests\bin\Release\netcoreapp2.2\publish\ObjectCloner.Tests.dll -noshadow" -filter:"+[ObjectCloner*]* -[ObjectCloner.Tests*]*" -output:".\MyProject_coverage.xml"
-  - cmd: codecov -f "MyProject_coverage.xml"
+  - cmd: "packages/opencover/4.7.922/tools/OpenCover.Console.exe" -register:user -target:"dotnet.exe" -targetargs:"test" -output:"./coverage.xml" -oldstyle -filter:"+[ObjectCloner*]* -[ObjectCloner.Test*]*" 
+  - cmd: codecov -f "coverage.xml"
+  - cmd: rm "coverage.xml"
 on_finish :
   # any cleanup in here
 deploy: off
