@@ -7,15 +7,15 @@ using ObjectCloner.Internal;
 namespace ObjectCloner
 {
     /// <summary>
-    ///     Provides static helper methods that clone an object of type <typeparamref name="T"/>, either shallowly or deeply.
+    ///     Provides static helper methods that clone an object, either shallowly or deeply.
     /// </summary>
-    /// <typeparam name="T">The type of object to clone.</typeparam>
     public static class ObjectCloner
     {
         /// <summary>
         ///     Creates a shallow copy of <paramref name="original"/>.
         /// </summary>
         /// <param name="original">The object to copy. Can be null.</param>
+        /// <typeparam name="T">The type of object to clone. Shallow clone does not care much about the type, it is safe to use <code>object</code>.</typeparam>
         /// <returns>Returns a new object of type <typeparamref name="T"/>, with all fields set to the same value as in <paramref name="original"/>.</returns>
         /// <remarks>
         ///     <para>
@@ -40,6 +40,10 @@ namespace ObjectCloner
         ///     Performs a deep clone on <paramref name="original"/>.
         /// </summary>
         /// <param name="original">The object to clone, or null.</param>
+        /// <typeparam name="T">
+        ///    <para>The type of object to clone.</para>
+        ///    <para>Be sure to use the concrete type of the input, not some general type like <code>object</code>. Deep cloning of fields/properties is based on static reflection of T, fields only present on derived types will not be cloned.</para>
+        /// </typeparam>
         /// <returns>A new object of type <typeparamref name="T"/>, with all fields cloned deeply.</returns>
         /// <remarks>
         ///     <para>
