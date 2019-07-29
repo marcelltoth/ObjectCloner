@@ -1,8 +1,16 @@
-version: '1.0.{build}'
+version: '2.0.0'
 image: Visual Studio 2017
 branches:
   only:
   - master
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
 init:
   # Good practise, because Windows line endings are different from Unix/Linux ones
   - cmd: git config --global core.autocrlf true
