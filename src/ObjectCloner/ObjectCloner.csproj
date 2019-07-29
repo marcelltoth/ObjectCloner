@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <Version>0.0.0</Version>
-        
         <TargetFramework>netstandard2.0</TargetFramework>
+        
         <Authors>Marcell Toth</Authors>
         <Title>ObjectCloner</Title>
         
@@ -17,6 +17,8 @@
         <PackageProjectUrl>https://github.com/marcelltoth/ObjectCloner</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/marcelltoth/ObjectCloner/blob/master/LICENSE.md</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/marcelltoth/ObjectCloner</RepositoryUrl>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
 </Project>
