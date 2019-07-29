@@ -17,7 +17,7 @@ namespace ObjectCloner.Internal
 
         static DeepCloneInternal()
         {
-            if (typeof(T).IsPrimitive || typeof(T) == typeof(string))
+            if (TypeHelper<T>.CanSkipDeepClone)
             {
                 DeepCloner = Identity;
                 return;
