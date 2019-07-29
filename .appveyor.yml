@@ -38,7 +38,7 @@ test_script:
   - cmd: dotnet test -c Release --no-build
   # Run code coverage
   - cmd: >
-     "packages/opencover/4.7.922/tools/OpenCover.Console.exe" -register:user -target:"dotnet.exe" -targetargs:"test" -output:"./coverage.xml" -oldstyle -filter:"+[ObjectCloner*]* -[ObjectCloner.Test*]*"
+     "packages/opencover/4.7.922/tools/OpenCover.Console.exe" -register:user -target:"dotnet.exe" -targetargs:"test -c Release" -output:"./coverage.xml" -oldstyle -filter:"+[ObjectCloner*]* -[ObjectCloner.Test*]*"
   - cmd: codecov -f "coverage.xml"
   - cmd: rm "coverage.xml"
 on_finish :
