@@ -23,7 +23,7 @@ It utilizes compiled Expression Trees under the hood, making it **just as fast a
 <sup id="f2">2</sup> Interface-typed fields (`IEnumerable`, etc.) will be cloned using their actual runtime types.
 
 ### Installation
-The package is available from *NuGet*. Install via the package manager console: `PM> Install-Package AutoMapper` the dotnet command line: `dotnet add package ObjectCloner` or using your IDE's visual NuGet tool.
+The package is available from *NuGet* as `ObjectCloner` or `ObjectCloner.Extensions` (see *Usage*). Install via the package manager console: `PM> Install-Package ObjectCloner` the dotnet command line: `dotnet add package ObjectCloner` or using your IDE's visual NuGet tool.
 
 ### Usage
 The library exposes a static class with two generic methods, making the usage very straightforward.
@@ -34,9 +34,14 @@ or
 ```csharp
 var clone = ObjectCloner.ShallowClone(original);
 ```
+If you would rather use an extension method format and don't mind polluting your `object` type install the package `ObjectCloner.Extensions` instead and use it like so:
+
+```csharp
+var clone = original.DeepClone();
+```
 
 ### Performance
-In a benchmark cloning a custom class hierarchy ObjectCloner beats every traditional solution but custom written cloning code.
+In a benchmark cloning a custom class hierarchy ObjectCloner beats every traditional solution except custom written cloning code.
 
 |                Method |         Mean |        Error |       StdDev |  Ratio | RatioSD |
 |---------------------- |-------------:|-------------:|-------------:|-------:|--------:|
