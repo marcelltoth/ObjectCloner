@@ -31,7 +31,7 @@ namespace ObjectCloner.PerformanceBenchmarks
         public object Original { get; set; }
 
         [Benchmark(Baseline = true)]
-        public object CloneViaCustomWrittenCode()
+        public object CustomCode()
         {
             switch (Original)
             {
@@ -44,25 +44,25 @@ namespace ObjectCloner.PerformanceBenchmarks
 
 
         [Benchmark]
-        public object CloneViaObjectCloner()
+        public object ObjectClonerDeepClone()
         {
             return ObjectCloner.DeepClone(Original);
         }
 
         [Benchmark]
-        public object CloneViaBinaryFormatter()
+        public object BinaryFormatter()
         {
             return BinaryFormatterCloner.DeepClone(Original);
         }
 
         [Benchmark]
-        public object CloneViaReflection()
+        public object Reflection()
         {
             return ReflectionCloner.Copy(Original);
         }
         
         [Benchmark]
-        public object CloneViaNewtonsoftJson()
+        public object NewtonsoftJson()
         {
             return NewtonsoftJsonCloner.DeepClone(Original);
         }
