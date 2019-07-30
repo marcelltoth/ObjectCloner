@@ -23,11 +23,11 @@ namespace ObjectCloner.Internal
         /// </remarks>
         public static DeepCloner GetDeepCloner(Type type)
         {
-            if (TypeHelper.CanSkipDeepClone(type))
-                return Identity;
-
             return _clonerMap.GetOrAdd(type, t =>
             {
+                if (TypeHelper.CanSkipDeepClone(type))
+                    return Identity;
+                
                 var builder = new DeepCloneExpressionBuilder(t);
                 Expression<DeepCloner> finalExpression = builder.Build();
 #if DEBUG

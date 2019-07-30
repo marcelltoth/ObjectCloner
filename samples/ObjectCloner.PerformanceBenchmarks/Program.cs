@@ -1,14 +1,27 @@
 ﻿using System;
-
-using BenchmarkDotNet.Running;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ObjectCloner.PerformanceBenchmarks
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            BenchmarkRunner.Run<PerformanceBenchmark>();
+#if RELEASE
+            BenchmarkDotNet.Running.BenchmarkRunner.Run<PerformanceBenchmark>();
+#else
+            // this block is for testing the cloning code with a profiler
+            PerformanceBenchmark benchmark = new PerformanceBenchmark();
+            benchmark.Original = PerformanceBenchmark.CreateTestObjects().First();
+            Console.ReadKey();
+            List<object> clones = new List<object>();
+            for (int i = 0; i < 1000000; i++)
+            {
+                clones.Add(benchmark.ObjectClonerDeepClone());
+            }
+            Console.WriteLine(clones.Count);
+#endif
         }
     }
 }
