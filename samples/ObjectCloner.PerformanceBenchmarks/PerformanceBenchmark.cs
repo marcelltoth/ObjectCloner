@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using BenchmarkDotNet.Attributes;
@@ -8,7 +9,7 @@ using ObjectCloner.PerformanceBenchmarks.Reference;
 namespace ObjectCloner.PerformanceBenchmarks
 {
     [MarkdownExporter, AsciiDocExporter, HtmlExporter, RPlotExporter]
-    [SimpleJob(launchCount: 1, warmupCount: 5, targetCount: 10)]
+    [SimpleJob(1,  5, 10)]
     [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
     public class PerformanceBenchmark
     {
@@ -28,6 +29,18 @@ namespace ObjectCloner.PerformanceBenchmarks
 
         [ParamsSource(nameof(CreateTestObjects))]
         public object Original { get; set; }
+
+        [Benchmark(Baseline = true)]
+        public object CloneViaCustomWrittenCode()
+        {
+            switch (Original)
+            {
+                case SampleClass sc:
+                    return CustomSampleClassCloner.DeepClone(sc);
+                default:
+                    throw new NotImplementedException();
+            }
+        }
 
 
         [Benchmark]
