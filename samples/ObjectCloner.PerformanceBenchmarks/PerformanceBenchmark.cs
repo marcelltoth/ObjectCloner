@@ -48,5 +48,11 @@ namespace ObjectCloner.PerformanceBenchmarks
             return ReflectionCloner.Copy(Original);
         }
         
+        [Benchmark]
+        public object CloneViaNewtonsoftJson()
+        {
+            return NewtonsoftJsonCloner.DeepClone(Original);
+        }
+        
     }
 }
