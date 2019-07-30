@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+
+#if DEBUG
 using AgileObjects.ReadableExpressions;
+#endif
 
 namespace ObjectCloner.Internal
 {

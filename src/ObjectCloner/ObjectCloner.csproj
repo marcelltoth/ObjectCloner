@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Version>2.1.7</Version>
+        <Version>2.1.999</Version>
         <TargetFramework>netstandard2.0</TargetFramework>
         
         <Authors>Marcell Toth</Authors>
@@ -22,7 +22,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="AgileObjects.ReadableExpressions" Version="2.3.2" PrivateAssets="all" />
+      <PackageReference Include="AgileObjects.ReadableExpressions" Version="2.3.2" Condition="'$(Configuration)' == 'Debug'" />
     </ItemGroup>
 
 </Project>
