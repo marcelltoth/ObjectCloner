@@ -16,6 +16,8 @@ It utilizes compiled Expression Trees under the hood, making it **just as fast a
 - [x] Preserves reference equality in the tree<sup>[1](#f1)</sup>
 - [x] Handles circular dependencies
 - [x] Handles polymorphism<sup>[2](#f2)</sup>
+- [x] MIT license
+- [x] 100% test coverage
 
 
 <sup id="f1">1</sup> For example if you put the same object into an array 3 times, you will get back a different list which also contains the same single clone object 3 times.
