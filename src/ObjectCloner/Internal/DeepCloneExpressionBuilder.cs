@@ -277,7 +277,7 @@ namespace ObjectCloner.Internal
                     yield return Expression.Call(
                         Expression.Constant(field),
                         setValueMethod,
-                        _cloneVariable,
+                        Expression.Convert(_cloneVariable, _typeOfObject),
                         CreateRecursiveCallExpression(Expression.Field(_originalVariable, field)));
                 }
                 
