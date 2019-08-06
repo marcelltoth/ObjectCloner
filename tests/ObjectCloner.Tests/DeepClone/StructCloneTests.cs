@@ -34,6 +34,15 @@ namespace ObjectCloner.Tests.DeepClone
             
             Assert.Null(result.ClassProp);
         }
+
+        [Fact]
+        public void CopyesReadOnlyClassField()
+        {
+            TestStructWithReadOnlyClassField original = new TestStructWithReadOnlyClassField(new TestClass {SomeValue = 42});
+            var clone = ObjectCloner.DeepClone(original);
+            
+            Assert.Equal(42, clone.ClassField.SomeValue);
+        }
     
 
         private struct TestStruct
@@ -46,6 +55,16 @@ namespace ObjectCloner.Tests.DeepClone
         private class TestClass
         {
             public int SomeValue { get; set; }
+        }
+
+        private struct TestStructWithReadOnlyClassField
+        {
+            public readonly TestClass ClassField;
+
+            public TestStructWithReadOnlyClassField(TestClass @class)
+            {
+                ClassField = @class;
+            }
         }
     }
 }
