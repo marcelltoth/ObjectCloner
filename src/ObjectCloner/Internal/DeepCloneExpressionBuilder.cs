@@ -152,7 +152,7 @@ namespace ObjectCloner.Internal
             
             Debug.Assert(itemType != null);
 
-            if (itemType.IsValueType)
+            if (TypeHelper.CanSkipDeepClone(itemType))
             {
                 return Expression.Assign(
                     _cloneVariable,
