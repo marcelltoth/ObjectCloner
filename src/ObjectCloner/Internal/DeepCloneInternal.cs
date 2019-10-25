@@ -33,9 +33,14 @@ namespace ObjectCloner.Internal
                 
                 var builder = new DeepCloneExpressionBuilder(t);
                 Expression<DeepCloner> finalExpression = builder.Build();
+                
 #if DEBUG
+                Debug.WriteLine("################");
+                Debug.WriteLine(type.Name);
+                Debug.WriteLine("################");
                 Debug.WriteLine(finalExpression.ToReadableString());
 #endif
+                
                 return finalExpression.Compile();
             });
         }
