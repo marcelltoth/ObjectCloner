@@ -10,7 +10,8 @@ namespace ObjectCloner.PerformanceBenchmarks
 {
     [MarkdownExporter, AsciiDocExporter, HtmlExporter, RPlotExporter]
     [SimpleJob(1,  5, 10)]
-    [Orderer(SummaryOrderPolicy.FastestToSlowest, MethodOrderPolicy.Declared)]
+    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
+    [MemoryDiagnoser]
     public class PerformanceBenchmark
     {
         public static IEnumerable<object> CreateTestObjects()
