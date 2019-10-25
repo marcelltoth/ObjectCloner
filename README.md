@@ -47,10 +47,10 @@ In a benchmark cloning a custom class hierarchy ObjectCloner beats every traditi
 
 |                Method |         Mean |        Error |       StdDev |  Ratio | RatioSD |
 |---------------------- |-------------:|-------------:|-------------:|-------:|--------:|
-|           Custom Code |     90.13 ns |     6.075 ns |     4.018 ns |   1.00 |    0.00 |
-|          **ObjectCloner** |    **691.56 ns** |    28.003 ns |    16.664 ns |   7.69 |    0.46 |
-|            Reflection |  2,644.11 ns |   172.854 ns |   114.332 ns |  29.35 |    0.75 |
-|       Newtonsoft.Json | 10,036.41 ns | 1,067.707 ns |   706.222 ns | 111.57 |    9.45 |
-|       BinaryFormatter | 21,779.89 ns | 1,695.177 ns | 1,121.254 ns | 241.77 |   10.21 |
+|           Custom Code |     88.71 ns |     4.242 ns |     2.826 ns |   1.00 |    0.00 |
+|      **ObjectCloner** |    **520.09 ns** |  54.632 ns |  36.136 ns |   5.88 |    0.56 |
+|            Reflection |  2,648.47 ns |   172.854 ns |   112.711 ns |  29.88 |    1.51 |
+|       Newtonsoft.Json |  9,315.16 ns |   661.012 ns |   437.218 ns | 105.10 |    6.05 |
+|       BinaryFormatter | 22,743.60 ns | 1,369.405 ns | 1,121.254 ns | 256.52 |   10.89 |
 
 You can find the benchmarks in the *samples* folder of the solution and run them yourself.
