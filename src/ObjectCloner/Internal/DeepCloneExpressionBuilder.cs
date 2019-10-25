@@ -21,6 +21,7 @@ namespace ObjectCloner.Internal
         private readonly MethodInfo itemClonerGetter = typeof(DeepCloneInternal).GetMethod("GetDeepCloner", BindingFlags.Static | BindingFlags.Public);
         private readonly MethodInfo invokeMethod = typeof(DeepCloner).GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
         private readonly MethodInfo getTypeMethod = _typeOfObject.GetMethod("GetType", BindingFlags.Public | BindingFlags.Instance);
+        private readonly MethodInfo arrayCloneMethod = typeof(Array).GetMethod("Clone", BindingFlags.Public | BindingFlags.Instance);
 
         public DeepCloneExpressionBuilder(Type typeOfT)
         {
@@ -148,6 +149,19 @@ namespace ObjectCloner.Internal
             // }
 
             Type itemType = _typeOfT.GetElementType();
+            
+            Debug.Assert(itemType != null);
+
+            if (itemType.IsValueType)
+            {
+                return Expression.Assign(
+                    _cloneVariable,
+                    Expression.Convert(
+                            Expression.Call(_originalVariable, arrayCloneMethod),
+                            _typeOfT
+                        )
+                );
+            }
             
             ParameterExpression lengthVariable = Expression.Variable(typeof(int));
             ParameterExpression indexVariable = Expression.Variable(typeof(int));
