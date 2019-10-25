@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
@@ -26,6 +27,8 @@ namespace ObjectCloner.PerformanceBenchmarks
                 },
                 StringProp = "Outer string prop"
             };
+
+            yield return Enumerable.Range(1, 500).ToArray();
         }
 
         [ParamsSource(nameof(CreateTestObjects))]
@@ -38,6 +41,8 @@ namespace ObjectCloner.PerformanceBenchmarks
             {
                 case SampleClass sc:
                     return CustomSampleClassCloner.DeepClone(sc);
+                case int[] intArr:
+                    return (int[])intArr.Clone();
                 default:
                     throw new NotImplementedException();
             }
