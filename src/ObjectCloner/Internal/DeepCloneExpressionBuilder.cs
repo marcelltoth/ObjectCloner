@@ -254,7 +254,7 @@ namespace ObjectCloner.Internal
         
         private IEnumerable<Expression> CreateFieldCopyExpressions()
         {
-            var fields = _typeOfT.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            IEnumerable<FieldInfo> fields = _typeOfT.GetAllFieldsDeep();
             
             foreach (FieldInfo field in fields)
             {
