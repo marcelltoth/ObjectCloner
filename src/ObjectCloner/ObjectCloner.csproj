@@ -13,7 +13,7 @@
             It utilizes compiled Expression Trees under the hood, making it just as fast as (or faster than) a hand-written DeepClone method.
         </Description>
         <PackageIconUrl>https://raw.githubusercontent.com/marcelltoth/ObjectCloner/master/icon.png</PackageIconUrl>
-        <PackageVersion>2.2.1</PackageVersion>
+        <PackageVersion>2.2.2</PackageVersion>
         <PackageProjectUrl>https://github.com/marcelltoth/ObjectCloner</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/marcelltoth/ObjectCloner/blob/master/LICENSE.md</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/marcelltoth/ObjectCloner</RepositoryUrl>
