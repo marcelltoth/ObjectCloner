@@ -16,7 +16,7 @@ namespace ObjectCloner.Tests.DeepClone
 
             var clone = ObjectCloner.DeepClone(input);
             
-            Assert.NotEqual(input.ListClassesBase, clone.ListClassesBase);
+            Assert.NotSame(input.ListClassesBase, clone.ListClassesBase);
         }
         
         private class SecondClass
