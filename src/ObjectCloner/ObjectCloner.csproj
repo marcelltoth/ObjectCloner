@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Version>2.1.8</Version>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         
         <Authors>Marcell Toth</Authors>
         <Title>ObjectCloner</Title>
@@ -22,7 +22,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="AgileObjects.ReadableExpressions" Version="2.3.2" Condition="'$(Configuration)' == 'Debug'" />
+      <PackageReference Include="AgileObjects.ReadableExpressions" Version="3.1.1" Condition="'$(Configuration)' == 'Debug'" />
     </ItemGroup>
 
 </Project>
