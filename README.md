@@ -45,12 +45,19 @@ var clone = original.DeepClone();
 ### Performance
 In a benchmark cloning a custom class hierarchy ObjectCloner beats every traditional solution except custom written cloning code.
 
-|                Method |         Mean |        Error |       StdDev |  Ratio | RatioSD |
-|---------------------- |-------------:|-------------:|-------------:|-------:|--------:|
-|           Custom Code |     88.71 ns |     4.242 ns |     2.826 ns |   1.00 |    0.00 |
-|      **ObjectCloner** |    **520.09 ns** |  54.632 ns |  36.136 ns |   5.88 |    0.56 |
-|            Reflection |  2,648.47 ns |   172.854 ns |   112.711 ns |  29.88 |    1.51 |
-|       Newtonsoft.Json |  9,315.16 ns |   661.012 ns |   437.218 ns | 105.10 |    6.05 |
-|       BinaryFormatter | 22,743.60 ns | 1,369.405 ns | 1,121.254 ns | 256.52 |   10.89 |
+|                Method |      Original |          Mean |        Error |       StdDev |  Ratio | RatioSD |   Gen 0 | Allocated |
+|---------------------- |-------------- |--------------:|-------------:|-------------:|-------:|--------:|--------:|----------:|
+|            CustomCode | Complex class |      81.75 ns |     10.61 ns |     7.019 ns |   1.00 |    0.00 |  0.0356 |     112 B |
+| ObjectClonerDeepClone | Complex class |     427.93 ns |     48.31 ns |    31.956 ns |   5.26 |    0.52 |  0.1884 |     592 B |
+|            Reflection | Complex class |   1,492.95 ns |    109.44 ns |    72.388 ns |  18.37 |    1.64 |  0.1698 |     536 B |
+|        NewtonsoftJson | Complex class |   7,555.28 ns |    404.12 ns |   240.484 ns |  93.52 |    6.67 |  2.3880 |   7,496 B |
+|       BinaryFormatter | Complex class |  16,118.49 ns |  1,159.01 ns |   689.705 ns | 199.95 |   20.92 |  7.0648 |  22,177 B |
+|                       |               |               |              |              |        |         |         |           |
+|            CustomCode |    Int32[500] |     439.19 ns |     87.06 ns |    57.583 ns |   1.00 |    0.00 |  0.6430 |   2,024 B |
+| ObjectClonerDeepClone |    Int32[500] |     456.94 ns |     29.23 ns |    17.392 ns |   1.05 |    0.13 |  0.6981 |   2,192 B |
+|            Reflection |    Int32[500] |   1,021.77 ns |    168.44 ns |   111.413 ns |   2.36 |    0.41 |  0.7305 |   2,296 B |
+|       BinaryFormatter |    Int32[500] |   9,223.63 ns |  2,039.10 ns | 1,348.736 ns |  21.47 |    4.88 |  6.7215 |  21,097 B |
+|        NewtonsoftJson |    Int32[500] | 201,774.82 ns | 10,608.79 ns | 6,313.120 ns | 464.78 |   63.48 | 28.0762 |  88,120 B |
+
 
 You can find the benchmarks in the *samples* folder of the solution and run them yourself.
